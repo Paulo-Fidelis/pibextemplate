@@ -1,0 +1,9 @@
+prompt = f'''Crie várioas perguntas e respostas que resumam o documento que estou lhe passando:{text}.
+             As perguntas devem seguir o formato a seguir: 
+             
+             Pergunta 1: *pergunta criada*
+             Resposta 1: *resposta da pergunta acima*
+
+             A resposta deve ter apenas as perguntas e respostas.
+    '''
+promptTeste = f"a reposta que você me traz está em que formato de dado?"

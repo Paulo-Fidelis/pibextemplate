@@ -1,0 +1,5 @@
+flask
+Together
+sqlalchemy
+pypdf
+dotenv

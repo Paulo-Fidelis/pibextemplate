@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <form action="/inserirDocument" method="post" enctype=multipart/form-data>
+    <input type="text" name="NomeDocument" required>
+    <input type="file" name="fileDocument" accept=".pdf">
+    <button type="submit">aperta ai</button>
+  </form>
+
+  {% if documents |length > 0 %}
+    <h2>Todos os documentos</h2>
+      <ul>
+        {% for document in documents %}
+        <li>
+          <strong>Nome: </strong> {{ document.nome_document }} <br>
+          <strong>Document: </strong> {{ document.extracao_texto}}
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p> deu ruim </p>
+      {% endif%}
+
+</body>
+</html>
