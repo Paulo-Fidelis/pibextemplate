@@ -1,5 +1,4 @@
-flask
-Together
-sqlalchemy
+fastapi[standard]
+requests
 pypdf
 dotenv

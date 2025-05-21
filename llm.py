@@ -1,49 +1,51 @@
-from together import Together
 from pypdf import PdfReader
 from dotenv import load_dotenv
+import requests
+import os
 
-caminho = "./pdfs/organizacaoacademica_atualizada_marco_2016.pdf"
 
-leitor = PdfReader(caminho)
-
-client = Together()
-
-perguntas = []
-respostas = []
-
-text = ""
-for page in leitor.pages:
-    text += page.extract_text() + "\n"
 
 load_dotenv()
+ANYTHINGLLM_API_URL = "http://localhost:3001/api/v1"
+API_KEY = os.getenv('ANYTHING_LLM_API_KEY') 
 
-prompt = f'''Crie várioas perguntas e respostas que resumam o documento que estou lhe passando:{text}.
-             As perguntas devem seguir o formato a seguir: 
-             
-             Pergunta 1: pergunta criada;
-             Resposta 1: resposta da pergunta acima;
-
-             A resposta deve ter apenas as perguntas e respostas e você deve pôr o ponto e vírgula ao final de todas as respostas criadas.
-    '''
-promptTeste = f"a reposta que você me traz está em que formato de dado?"
-
-
-
-response = client.chat.completions.create(
-    model="meta-llama/Llama-4-Scout-17B-16E-Instruct",
-    messages=[{"role": "user", "content":prompt}],
-  )
-
-# print(response.choices[0].message.content)
     
+headers = {
+    "accept": "application/json",
+    "Content-Type": "application/json",
+    "Authorization":f'Bearer {API_KEY}'
+}
 
-resposta_string = str(response.choices[0].message.content)
 
-print(resposta_string.split("; "))
+def autenticacao():
+    response = requests.get(f"{ANYTHINGLLM_API_URL}/auth", headers=headers)
+    try:
+        print(response.json())
+    except Exception as e:
+        print(e)
 
-for dupla in resposta_string:
-  perguntas.append(dupla[0])      
-  respostas.append(dupla[1])
+def todos_workspaces():
+    response = requests.get(f'{ANYTHINGLLM_API_URL}/workspaces', headers=headers)
+    try:
+        print(response.json())
+    except Exception as e:
+        print(e)
 
-print(perguntas)
-print(respostas)
+def mensagem_para_o_llm(prompt):
+    
+    dados = {
+    "message":prompt,
+    "mode": "query"
+    }
+
+    endpoint = f"{ANYTHINGLLM_API_URL}/workspace/legal/chat"
+    
+    
+    response = requests.post(endpoint,json=dados, headers=headers)
+    if response.status_code == 200:
+        data = response.json()
+        print(f"{data.get('textResponse', 'resposta não encontrada')}")     
+
+if __name__ == "__main__":
+    prompt = "O que é organização academica?"
+    mensagem_para_o_llm(prompt)
