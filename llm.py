@@ -47,5 +47,4 @@ def mensagem_para_o_llm(prompt):
         print(f"{data.get('textResponse', 'resposta não encontrada')}")     
 
 if __name__ == "__main__":
-    prompt = "O que é organização academica?"
-    mensagem_para_o_llm(prompt)
+    todos_workspaces()
