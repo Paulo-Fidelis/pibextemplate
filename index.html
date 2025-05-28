@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste API FastAPI</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        input, textarea, button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .response {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 10px;
+            min-height: 50px;
+            border-left: 3px solid #4CAF50;
+            white-space: pre-wrap;
+        }
+        .file-info {
+            margin-top: 10px;
+            font-style: italic;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Teste da API FastAPI</h1>
+        
+        <!-- Seção de Chat -->
+        <div class="section">
+            <h2>Chat com LLM</h2>
+            <label for="prompt">Digite sua pergunta:</label>
+            <input type="text" id="prompt" placeholder="O que você gostaria de perguntar?">
+            <button onclick="getLLMResponse()">Enviar Pergunta</button>
+            <div class="response" id="llmResponse">Resposta aparecerá aqui...</div>
+        </div>
+        
+        <!-- Seção de Upload -->
+        <div class="section">
+            <h2>Upload de Documento</h2>
+            <label for="file">Selecione um arquivo:</label>
+            <input type="file" id="file">
+            <button onclick="uploadFile()">Enviar Arquivo</button>
+            <div class="response" id="uploadResponse">Resposta do upload aparecerá aqui...</div>
+        </div>
+        
+    </div>
+
+    <script>
+        // URL base da API - altere se necessário
+        const API_BASE_URL = 'http://localhost:8000';
+        
+        // Função para obter resposta do LLM
+        async function getLLMResponse() {
+            const promptInput = document.getElementById('prompt');
+            const responseDiv = document.getElementById('llmResponse');
+            
+            if (!promptInput.value.trim()) {
+                responseDiv.textContent = 'Por favor, digite uma pergunta';
+                return;
+            }
+            
+            responseDiv.textContent = 'Processando...';
+            
+            try {
+                const encodedPrompt = encodeURIComponent(promptInput.value);
+                const response = await fetch(`${API_BASE_URL}/llmResponse/${encodedPrompt}`);
+                
+                if (!response.ok) {
+                    throw new Error(`Erro na requisição: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                responseDiv.textContent = data.response || 'Sem resposta';
+            } catch (error) {
+                responseDiv.textContent = `Erro: ${error.message}`;
+                console.error('Erro:', error);
+            }
+        }
+        
+        // Função para enviar arquivo
+        async function uploadFile() {
+            const fileInput = document.getElementById('file');
+            const responseDiv = document.getElementById('uploadResponse');
+            
+            if (!fileInput.files || fileInput.files.length === 0) {
+                responseDiv.textContent = 'Por favor, selecione um arquivo';
+                return;
+            }
+            
+            responseDiv.textContent = 'Enviando arquivo...';
+            
+            try {
+                const formData = new FormData();
+                formData.append('file', fileInput.files[0]);
+                
+                const response = await fetch(`${API_BASE_URL}/uploadfile/`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Erro no upload: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                responseDiv.textContent = `Upload bem-sucedido! 
+Documento: ${data.name || 'Sem nome'}
+Tipo: ${data.type || 'Desconhecido'}
+Tamanho: ${data.size ? (data.size / 1024).toFixed(2) + ' KB' : 'Desconhecido'}`;
+            } catch (error) {
+                responseDiv.textContent = `Erro: ${error.message}`;
+                console.error('Erro:', error);
+            }
+        }
+        
+    </script>
+</body>
+</html>
