@@ -2,3 +2,5 @@ fastapi[standard]
 requests
 pypdf
 dotenv
+SpeechRecognition
+pyttsx3

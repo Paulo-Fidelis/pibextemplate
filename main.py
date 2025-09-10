@@ -2,14 +2,19 @@ from fastapi import FastAPI, UploadFile, File
 from fastapi.responses import HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
+import speech_recognition as sr
+import pyttsx3
 import requests
 import os
 
-#Pré configurações
+
 load_dotenv()
 ANYTHINGLLM_API_URL = "http://localhost:3001/api/v1"
 API_KEY = os.getenv('ANYTHING_LLM_API_KEY') 
-    
+
+recognizer = sr.Recognizer()
+engine = pyttsx3.init()
+
 headers = {
     "accept": "application/json",
     "Authorization":f'Bearer {API_KEY}'
@@ -27,6 +32,29 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+'''@app.get('/llmlisten/')
+def escutar():
+ with sr.Microphone() as microfone:       
+    try:
+        fala = recognizer.listen(microfone)
+        texto = recognizer.recognize_google(fala, language="pt-BR") #A biblioteca usa uma API do Google
+        print(f"Você disse: {texto}")
+        return texto
+    except sr.UnknownValueError:
+        print("Não entendi o que você disse.")
+        return None
+    except sr.RequestError as e:
+        print(f"Erro no serviço de reconhecimento de fala: {e}")
+        return None
+'''
+
+'''
+@app.get('/llmSay/{response}')
+def falar(response):
+    engine.say(response)
+    engine.runAndWait()
+'''
 @app.get('/llmResponse/{prompt}')
 def hello(prompt):
     dados = {
